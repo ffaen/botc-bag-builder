@@ -187,7 +187,7 @@ type ReleasedEdition =  'Trouble Brewing'
 type UnreleasedEdition = 'Unreleased Experimental'
 
 type Edition =
-ReleasedEdition 
+ReleasedEdition
   | UnreleasedEdition
   | 'Homebrew / Unknown'
 
@@ -205,6 +205,8 @@ type HomebrewCharacter = {
 }
 
 type BagMap = { [key in Character]: Edition }
+
+export type ParsedScript = { [key in BoxPick]: (Character | HomebrewCharacterId)[] }
 
 // Characters
 const characterEditionMap: BagMap = {
@@ -432,7 +434,7 @@ export function editionMapping(hasKickstarter: boolean): { [key in Edition]: Box
     }
 }
 
-export function parseScript(script: Script, hasKickstarter: boolean) {
+export function parseScript(script: Script, hasKickstarter: boolean): ParsedScript {
     const editions = groupCharactersByEdition(script)
 
 // remap the editions to BoxPick and then group everything again
