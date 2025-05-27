@@ -1,39 +1,80 @@
-# botc-bag-builder
+# BOTC Bag Builder
 
-This template should help get you started developing with Vue 3 in Vite.
+BOTC Bag Builder is a web tool for parsing and organizing Blood on the Clocktower (BOTC) script JSON files. It helps storytellers and players quickly determine which character tokens are needed for a given script, grouped by edition and box.
 
-## Recommended IDE Setup
+## Getting Started
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+### Prerequisites
 
-## Type Support for `.vue` Imports in TS
+- [Node.js](https://nodejs.org/) (v18+ recommended)
+- [npm](https://www.npmjs.com/)
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### Setup
 
-## Customize configuration
+1. **Install dependencies:**
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+   ```sh
+   npm install
+   ```
 
-## Project Setup
+2. **Start the development server:**
 
-```sh
-npm install
-```
+   ```sh
+   npm run dev
+   ```
 
-### Compile and Hot-Reload for Development
+   The app will be available at [http://localhost:5173](http://localhost:5173) (or as indicated in your terminal).
 
-```sh
-npm run dev
-```
+3. **Build for production:**
 
-### Type-Check, Compile and Minify for Production
+   ```sh
+   npm run build
+   ```
 
-```sh
-npm run build
-```
+4. **Preview the production build:**
+   ```sh
+   npm run preview
+   ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Linting and Formatting
 
-```sh
-npm run lint
-```
+- **Lint with ESLint and Oxlint:**
+  ```sh
+  npm run lint
+  ```
+- **Format code with Prettier:**
+  ```sh
+  npm run format
+  ```
+
+### Type Checking
+
+- **Type-check the project:**
+  ```sh
+  npm run type-check
+  ```
+
+### Testing
+
+- **Test the project with Vitest:**
+  ```sh
+  npm run test
+  ```
+
+## Usage
+
+1. Open the app in your browser.
+2. Upload a script JSON file, paste a script, or provide a URL to a script JSON.
+3. Optionally, check the "I have the Kickstarter set" box if you own the Kickstarter edition.
+4. Click "Parse Script" to see the required tokens grouped by box.
+
+## Technologies Used
+
+- [Vue 3](https://vuejs.org/)
+- [Vite](https://vite.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- TypeScript
+
+---
+
+_Blood on the Clocktower is a trademark of The Pandemonium Institute. This project is not affiliated with or endorsed by The Pandemonium Institute._

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { groupCharactersByEdition, parseScript } from './logic'
-import type { Script } from './logic'
+import type { HomebrewCharacterId, Script } from './logic'
 
 describe('groupCharactersByEdition', () => {
   it('groups characters by their edition', () => {
@@ -12,9 +12,9 @@ describe('groupCharactersByEdition', () => {
       'artist',
       'fanggu',
       'alchemist',
-      'unknown_character' as any,
+      'unknown_character' as HomebrewCharacterId,
     ]
-    const result = groupCharactersByEdition(input)
+    const result = groupCharactersByEdition(input as Script)
     expect(result).toEqual({
       'Trouble Brewing': ['washerwoman', 'empath'],
       'Bad Moon Rising': ['grandmother', 'sailor'],
@@ -29,15 +29,15 @@ describe('groupCharactersByEdition', () => {
   })
 
   it('puts all unknowns in Homebrew / Unknown', () => {
-    const input = ['foo' as any, 'bar' as any]
-    expect(groupCharactersByEdition(input)).toEqual({
+    const input = ['foo' as HomebrewCharacterId, 'bar' as HomebrewCharacterId]
+    expect(groupCharactersByEdition(input as Script)).toEqual({
       'Homebrew / Unknown': ['foo', 'bar'],
     })
   })
 
   it('handles only one edition', () => {
-    const input = ['washerwoman' as any, 'empath' as any]
-    expect(groupCharactersByEdition(input)).toEqual({
+    const input = ['washerwoman' as HomebrewCharacterId, 'empath' as HomebrewCharacterId]
+    expect(groupCharactersByEdition(input as Script)).toEqual({
       'Trouble Brewing': ['washerwoman', 'empath'],
     })
   })
@@ -161,53 +161,58 @@ describe('groupCharactersByEdition', () => {
       },
     ]
 
-    expect(groupCharactersByEdition(input)).toEqual(
-      {
-        "Bad Moon Rising": [
-          "grandmother",
-          "innkeeper",
-          "gambler",
-          "gossip",
-          "lunatic",
-          "tinker",
-          "devilsadvocate",
-          "assassin",
-          "po",
-        ],
-        "Homebrew / Unknown": [
-          "stowedaway-bonecollector",
-          "stowedaway-apprentice",
-          "stowedaway-deviant",
-          "stowedaway-scapegoat",
-        ],
-        "Kickstarter Experimental": [
-          "pixie",
-          "puzzlemaster",
-        ],
-        "Sects and Violets": [
-          "snakecharmer",
-          "savant",
-          "seamstress",
-          "mutant",
-          "cerenovus",
-          "vigormortis",
-        ],
-        "Trouble Brewing": [
-          "ravenkeeper",
-          "poisoner",
-          "imp",
-        ],
-        "Unreleased Experimental": [
-          "highpriestess",
-          "fisherman",
-          "tealady",
-          "poppygrower",
-          "summoner",
-        ],
-      }
+    expect(groupCharactersByEdition(input)).toEqual({
+      'Bad Moon Rising': [
+        'grandmother',
+        'innkeeper',
+        'gambler',
+        'gossip',
+        'lunatic',
+        'tinker',
+        'devilsadvocate',
+        'assassin',
+        'po',
+      ],
+      'Homebrew / Unknown': [
+        'stowedaway-bonecollector',
+        'stowedaway-apprentice',
+        'stowedaway-deviant',
+        'stowedaway-scapegoat',
+      ],
+      'Kickstarter Experimental': ['pixie', 'puzzlemaster'],
+      'Sects and Violets': [
+        'snakecharmer',
+        'savant',
+        'seamstress',
+        'mutant',
+        'cerenovus',
+        'vigormortis',
+      ],
+      'Trouble Brewing': ['ravenkeeper', 'poisoner', 'imp'],
+      'Unreleased Experimental': [
+        'highpriestess',
+        'fisherman',
+        'tealady',
+        'poppygrower',
+        'summoner',
+      ],
+    })
+  })
 
-    )
-
+  it('treats objects with id matching a known character as that character', () => {
+    const input = [
+      { id: 'savant' },
+      { id: 'washerwoman' },
+      { id: 'unknown_homebrew' },
+      'vortox',
+      'washerwoman',
+    ]
+    const result = groupCharactersByEdition(input as Script)
+    expect(result).toEqual({
+      'Sects and Violets': ['savant', 'vortox'],
+      'Trouble Brewing': ['washerwoman', 'washerwoman'],
+      'Homebrew / Unknown': ['unknown_homebrew'],
+    })
   })
 })
 
@@ -221,9 +226,9 @@ describe('parseScript', () => {
       'artist',
       'fanggu',
       'alchemist',
-      'unknown_character' as any,
+      'unknown_character' as HomebrewCharacterId,
     ]
-    const result = parseScript(input, true)
+    const result = parseScript(input as Script, true)
     expect(result).toEqual({
       'Trouble Brewing': ['washerwoman', 'empath'],
       'Bad Moon Rising': ['grandmother', 'sailor'],
@@ -242,9 +247,9 @@ describe('parseScript', () => {
       'artist',
       'fanggu',
       'alchemist',
-      'unknown_character' as any,
+      'unknown_character' as HomebrewCharacterId,
     ]
-    const result = parseScript(input, false)
+    const result = parseScript(input as Script, false)
     expect(result).toEqual({
       'Trouble Brewing': ['washerwoman', 'empath'],
       'Bad Moon Rising': ['grandmother', 'sailor'],
@@ -395,10 +400,7 @@ describe('parseScript', () => {
         'stowedaway-deviant',
         'stowedaway-scapegoat',
       ],
-      'Kickstarter Experimental': [
-        'pixie',
-        'puzzlemaster',
-      ],
+      'Kickstarter Experimental': ['pixie', 'puzzlemaster'],
       'Sects and Violets': [
         'snakecharmer',
         'savant',
@@ -407,11 +409,7 @@ describe('parseScript', () => {
         'cerenovus',
         'vigormortis',
       ],
-      'Trouble Brewing': [
-        'ravenkeeper',
-        'poisoner',
-        'imp',
-      ],
+      'Trouble Brewing': ['ravenkeeper', 'poisoner', 'imp'],
     })
   })
 })

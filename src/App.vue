@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { parseScript, type ParsedScript } from './logic/logic'
+import { parseScript, type ParsedScript, isTraveller, type Character } from './logic/logic'
 
 const scriptInput = ref<string>('')
 const parseResult = ref<ParsedScript | null>(null)
 const error = ref<string | null>(null)
 const hasKickstarter = ref<boolean>(false)
+const urlInput = ref<string>('') // New: for URL input
 
 function handleFileUpload(event: Event) {
   const files = (event.target as HTMLInputElement).files
@@ -26,14 +27,42 @@ function handlePaste(event: ClipboardEvent) {
   }
 }
 
+async function handleUrlPaste() {
+  error.value = null
+  parseResult.value = null
+  if (!urlInput.value) {
+    error.value = 'Please enter a URL.'
+    return
+  }
+  try {
+    const response = await fetch(urlInput.value)
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`)
+    }
+    const json = await response.json()
+    scriptInput.value = JSON.stringify(json, null, 2)
+    parseResult.value = parseScript(json, hasKickstarter.value)
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      error.value = 'Failed to fetch or parse JSON: ' + e.message
+      return
+    }
+    error.value = 'Unknown error.'
+  }
+}
+
 function tryParse() {
   error.value = null
   parseResult.value = null
   try {
     const json = JSON.parse(scriptInput.value)
     parseResult.value = parseScript(json, hasKickstarter.value)
-  } catch (e: any) {
-    error.value = 'Invalid JSON: ' + e.message
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      error.value = 'Failed to fetch or parse JSON: ' + e.message
+      return
+    }
+    error.value = 'Unknown error.'
   }
 }
 </script>
@@ -54,6 +83,23 @@ function tryParse() {
             @change="handleFileUpload"
             class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
+        </label>
+        <label class="block font-semibold text-gray-700">
+          <span class="block mb-2">Paste Script JSON URL</span>
+          <div class="flex gap-2">
+            <input
+              v-model="urlInput"
+              type="url"
+              placeholder="Paste JSON URL here"
+              class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 font-mono text-sm bg-gray-50"
+            />
+            <button
+              @click="handleUrlPaste"
+              class="py-2 px-4 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
+            >
+              Fetch
+            </button>
+          </div>
         </label>
         <div class="flex items-center justify-between">
           <label class="block font-semibold text-gray-700 w-full">
@@ -91,7 +137,7 @@ function tryParse() {
       </div>
       <div v-if="error" class="text-red-600 mt-4 w-full text-center font-semibold">{{ error }}</div>
       <div v-if="parseResult" class="mt-6 w-full">
-        <h2 class="text-lg font-bold text-gray-800 mb-2">Parsed Script Output</h2>
+        <h2 class="text-lg font-bold text-gray-800 mb-2">Character Collections:</h2>
         <div class="space-y-6">
           <div v-for="(chars, boxPick) in parseResult" :key="boxPick">
             <h3 class="text-blue-700 font-semibold text-base mb-2">{{ boxPick }}</h3>
@@ -99,7 +145,12 @@ function tryParse() {
               <span
                 v-for="char in chars"
                 :key="char"
-                class="inline-flex items-center px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs font-medium border border-blue-200"
+                :class="[
+                  'inline-flex items-center px-2 py-1 rounded text-xs font-medium border',
+                  isTraveller(char as Character)
+                    ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+                    : 'bg-blue-100 text-blue-800 border-blue-200',
+                ]"
               >
                 {{ char }}
               </span>

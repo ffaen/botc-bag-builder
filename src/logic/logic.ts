@@ -1,4 +1,4 @@
-type Character =
+export type Character =
   // Trouble Brewing (Trouble Brewing)
   | 'chef'
   | 'investigator'
@@ -85,8 +85,8 @@ type Character =
   | 'bonecollector'
   | 'deviant'
   // Experimental (Kickstarter Experimental, Unreleased Experimental)
-| 'poppygrower'
-| 'tealady'
+  | 'poppygrower'
+  | 'tealady'
   | 'steward'
   | 'knight'
   | 'noble'
@@ -175,33 +175,30 @@ type Character =
   | 'stormcatcher'
   | 'toymaker'
 
-type HomebrewCharacterId = string
+export type HomebrewCharacterId = string
 
-type ReleasedEdition =  'Trouble Brewing'
+type ReleasedEdition =
+  | 'Trouble Brewing'
   | 'Bad Moon Rising'
   | 'Sects and Violets'
   | 'Kickstarter Experimental'
-    | 'Fabled'
-
+  | 'Fabled'
 
 type UnreleasedEdition = 'Unreleased Experimental'
 
-type Edition =
-ReleasedEdition
-  | UnreleasedEdition
-  | 'Homebrew / Unknown'
+type Edition = ReleasedEdition | UnreleasedEdition | 'Homebrew / Unknown'
 
-type BoxPick = ReleasedEdition | "Substitute"
+type BoxPick = ReleasedEdition | 'Substitute'
 
 type MetaObject = {
-    id: "_meta",
-    [key: string]: any
+  id: '_meta'
+  [key: string]: unknown
 }
 
 type HomebrewCharacter = {
-    id: HomebrewCharacterId,
-    name: string,
-    [key: string]: any
+  id: HomebrewCharacterId
+  name: string
+  [key: string]: unknown
 }
 
 type BagMap = { [key in Character]: Edition }
@@ -390,6 +387,26 @@ const characterEditionMap: BagMap = {
   toymaker: 'Fabled',
 }
 
+const travellers: Character[] = [
+  'scapegoat',
+  'gunslinger',
+  'beggar',
+  'bureaucrat',
+  'thief',
+  'butcher',
+  'bonecollector',
+  'harlot',
+  'barista',
+  'deviant',
+  'apprentice',
+  'matron',
+  'voudon',
+  'judge',
+  'bishop',
+  'gangster',
+  'gnome',
+]
+
 export type Script = (Character | HomebrewCharacter | MetaObject)[]
 
 /**
@@ -397,17 +414,23 @@ export type Script = (Character | HomebrewCharacter | MetaObject)[]
  * @param characters Array of Character, HomebrewCharacter, or MetaObject
  * @returns Object: { [Edition]: (Character | HomebrewCharacter)[] }
  */
-export function groupCharactersByEdition(
-  characters: Script
-) {
+export function groupCharactersByEdition(characters: Script) {
   const editionMap: { [key in Edition]?: (Character | HomebrewCharacterId)[] } = {}
 
   for (const char of characters) {
     // Ignore meta objects
     if (typeof char === 'object' && char.id === '_meta') continue
 
-    // Homebrew character object
+    // Homebrew character object or object with id
     if (typeof char === 'object') {
+      // If id matches a known character, treat as that character
+      if (char.id && typeof char.id === 'string' && char.id in characterEditionMap) {
+        const edition = characterEditionMap[char.id as Character] ?? 'Homebrew / Unknown'
+        if (!editionMap[edition]) editionMap[edition] = []
+        editionMap[edition]!.push(char.id)
+        continue
+      }
+      // Otherwise treat as homebrew
       if (!editionMap['Homebrew / Unknown']) editionMap['Homebrew / Unknown'] = []
       editionMap['Homebrew / Unknown']!.push(char.id)
       continue
@@ -423,29 +446,41 @@ export function groupCharactersByEdition(
 }
 
 export function editionMapping(hasKickstarter: boolean): { [key in Edition]: BoxPick } {
-    return {
-        'Trouble Brewing': 'Trouble Brewing',
-        'Bad Moon Rising': 'Bad Moon Rising',
-        'Sects and Violets': 'Sects and Violets',
-        'Kickstarter Experimental': hasKickstarter ? 'Kickstarter Experimental' : 'Substitute',
-        'Unreleased Experimental': 'Substitute',
-        Fabled: 'Fabled',
-        'Homebrew / Unknown': 'Substitute',
-    }
+  return {
+    'Trouble Brewing': 'Trouble Brewing',
+    'Bad Moon Rising': 'Bad Moon Rising',
+    'Sects and Violets': 'Sects and Violets',
+    'Kickstarter Experimental': hasKickstarter ? 'Kickstarter Experimental' : 'Substitute',
+    'Unreleased Experimental': 'Substitute',
+    Fabled: 'Fabled',
+    'Homebrew / Unknown': 'Substitute',
+  }
 }
 
 export function parseScript(script: Script, hasKickstarter: boolean): ParsedScript {
-    const editions = groupCharactersByEdition(script)
+  const editions = groupCharactersByEdition(script)
 
-// remap the editions to BoxPick and then group everything again
-    const editionMap = editionMapping(hasKickstarter)
-    const boxPicks: { [key in BoxPick]: (Character | HomebrewCharacterId)[] } = {}
+  // remap the editions to BoxPick and then group everything again
+  const editionMap = editionMapping(hasKickstarter)
 
-    for (const edition in editions) {
-        const boxPick = editionMap[edition as Edition]
-        if (!boxPicks[boxPick]) boxPicks[boxPick] = []
-        boxPicks[boxPick].push(...editions[edition as Edition]!)
-    }
+  const boxPicks: { [key in BoxPick]: (Character | HomebrewCharacterId)[] } = {
+    'Trouble Brewing': [],
+    'Bad Moon Rising': [],
+    'Sects and Violets': [],
+    'Kickstarter Experimental': [],
+    Fabled: [],
+    Substitute: [],
+  }
 
-    return boxPicks
+  for (const edition in editions) {
+    const boxPick = editionMap[edition as Edition]
+    if (!boxPicks[boxPick]) boxPicks[boxPick] = []
+    boxPicks[boxPick].push(...editions[edition as Edition]!)
+  }
+
+  return boxPicks
+}
+export function isTraveller(char: Character): boolean {
+  // if the character is in the travellers list, return true
+  return travellers.includes(char)
 }
