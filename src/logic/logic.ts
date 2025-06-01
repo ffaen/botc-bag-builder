@@ -128,10 +128,10 @@ export function isTraveller(char: Character): boolean {
   return travellers.includes(char)
 }
 
-export function suggestSubstitutions(script: ParsedScript): { [key in Character]?: Character[] } {
+export function suggestSubstitutions(script: ParsedScript): { [key in Character]?: Character } {
   if (!script['Substitute']) return {}
 
-  const substitutions: { [key in Character]?: Character[] } = {}
+  const substitutions: { [key in Character]?: Character } = {}
 
   // Collect all characters already in the script (flatten all arrays)
   const usedCharacters = new Set(
@@ -139,6 +139,9 @@ export function suggestSubstitutions(script: ParsedScript): { [key in Character]
       .flat()
       .filter((c): c is Character => typeof c === 'string'),
   )
+
+  // Track which characters have been suggested as substitutions to avoid duplicates
+  const suggested = new Set<Character>()
 
   for (const char of script['Substitute']) {
     // Find the DatasetChar for the substituted character
@@ -151,13 +154,16 @@ export function suggestSubstitutions(script: ParsedScript): { [key in Character]
         (candidate: DatasetChar) =>
           candidate.id !== char && // not the same character
           !usedCharacters.has(candidate.id as Character) && // not already used
+          !suggested.has(candidate.id as Character) && // not already suggested
           candidate.roleType === charData.roleType && // same alignment
           !candidate.isDisabled, // not disabled
       )
       .map((c: DatasetChar) => c.id as Character)
 
     if (possibleSubs.length > 0) {
-      substitutions[char as Character] = possibleSubs
+      const firstSub = possibleSubs[0]
+      substitutions[char as Character] = firstSub
+      suggested.add(firstSub)
     }
   }
 

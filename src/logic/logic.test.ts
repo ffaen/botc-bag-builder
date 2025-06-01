@@ -431,10 +431,9 @@ describe('suggestSubstitutions', () => {
     }
     const result = suggestSubstitutions(script)
     expect(result).toHaveProperty('washerwoman')
-    expect(Array.isArray(result['washerwoman'])).toBe(true)
-    expect(result['washerwoman']!.length).toBeGreaterThan(0)
+    expect(typeof result['washerwoman']).toBe('string')
     // Should not suggest 'empath' (already used)
-    expect(result['washerwoman']).not.toContain('empath')
+    expect(result['washerwoman']).not.toBe('empath')
   })
 
   it('does not suggest substitutions for unknown character', () => {
@@ -452,8 +451,26 @@ describe('suggestSubstitutions', () => {
     }
     const result = suggestSubstitutions(script)
     if (result['washerwoman']) {
-      // All suggestions should not be disabled (cannot check directly, but at least array is present)
-      expect(Array.isArray(result['washerwoman'])).toBe(true)
+      expect(typeof result['washerwoman']).toBe('string')
     }
+  })
+
+  it('returns only one substitution per character', () => {
+    const script = {
+      Substitute: ['washerwoman', 'empath'],
+    }
+    const result = suggestSubstitutions(script)
+    expect(typeof result['washerwoman']).toBe('string')
+    expect(typeof result['empath']).toBe('string')
+  })
+
+  it('does not return the same substitution for multiple characters', () => {
+    const script = {
+      Substitute: ['washerwoman', 'empath', 'librarian'],
+    }
+    const result = suggestSubstitutions(script)
+    const subs = Object.values(result)
+    const uniqueSubs = new Set(subs)
+    expect(subs.length).toBe(uniqueSubs.size)
   })
 })
