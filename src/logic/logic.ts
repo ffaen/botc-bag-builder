@@ -1,179 +1,7 @@
-export type Character =
-  // Trouble Brewing (Trouble Brewing)
-  | 'chef'
-  | 'investigator'
-  | 'washerwoman'
-  | 'librarian'
-  | 'empath'
-  | 'fortuneteller'
-  | 'undertaker'
-  | 'monk'
-  | 'ravenkeeper'
-  | 'virgin'
-  | 'slayer'
-  | 'soldier'
-  | 'mayor'
-  | 'butler'
-  | 'drunk'
-  | 'recluse'
-  | 'saint'
-  | 'poisoner'
-  | 'spy'
-  | 'scarletwoman'
-  | 'baron'
-  | 'imp'
-  // Bad Moon Rising (Bad Moon Rising)
-  | 'grandmother'
-  | 'sailor'
-  | 'chambermaid'
-  | 'exorcist'
-  | 'innkeeper'
-  | 'gossip'
-  | 'gambler'
-  | 'courtier'
-  | 'professor'
-  | 'minstrel'
-  | 'sweetheart'
-  | 'fool'
-  | 'moonchild'
-  | 'tinker'
-  | 'goon'
-  | 'lunatic'
-  | 'godfather'
-  | 'devilsadvocate'
-  | 'assassin'
-  | 'witch'
-  | 'pukka'
-  | 'shabaloth'
-  | 'zombuul'
-  | 'po'
-  | 'pacifist'
-  | 'matron'
-  | 'judge'
-  | 'apprentice'
-  | 'voudon'
-  | 'bishop'
-  | 'mastermind'
-  // Sects & Violets (Sects and Violets)
-  | 'artist'
-  | 'clockmaker'
-  | 'dreamer'
-  | 'flowergirl'
-  | 'juggler'
-  | 'mathematician'
-  | 'seamstress'
-  | 'towncrier'
-  | 'savant'
-  | 'philosopher'
-  | 'oracle'
-  | 'sage'
-  | 'mutant'
-  | 'barber'
-  | 'klutz'
-  | 'cerenovus'
-  | 'vigormortis'
-  | 'vortox'
-  | 'fanggu'
-  | 'snakecharmer'
-  | 'sweetheart'
-  | 'pithag'
-  | 'eviltwin'
-  | 'witch'
-  | 'barista'
-  | 'harlot'
-  | 'butcher'
-  | 'bonecollector'
-  | 'deviant'
-  // Experimental (Kickstarter Experimental, Unreleased Experimental)
-  | 'poppygrower'
-  | 'tealady'
-  | 'steward'
-  | 'knight'
-  | 'noble'
-  | 'shugenja'
-  | 'pixie'
-  | 'bountyhunter'
-  | 'highpriestess'
-  | 'balloonist'
-  | 'general'
-  | 'preacher'
-  | 'villageidiot'
-  | 'king'
-  | 'cultleader'
-  | 'alsaahir'
-  | 'engineer'
-  | 'nightwatchman'
-  | 'huntsman'
-  | 'alchemist'
-  | 'cannibal'
-  | 'amnesiac'
-  | 'farmer'
-  | 'fisherman'
-  | 'acrobat'
-  | 'lycanthrope'
-  | 'choirboy'
-  | 'banshee'
-  | 'magician'
-  | 'atheist'
-  | 'golem'
-  | 'ogre'
-  | 'plaguedoctor'
-  | 'hatter'
-  | 'politician'
-  | 'zealot'
-  | 'damsel'
-  | 'snitch'
-  | 'heretic'
-  | 'puzzlemaster'
-  | 'mezepheles'
-  | 'harpy'
-  | 'fearmonger'
-  | 'psychopath'
-  | 'wizard'
-  | 'widow'
-  | 'xaan'
-  | 'marionette'
-  | 'summoner'
-  | 'goblin'
-  | 'boomdandy'
-  | 'vizier'
-  | 'organgrinder'
-  | 'boffin'
-  | 'yaggababble'
-  | 'lilmonsta'
-  | 'ojo'
-  | 'kazali'
-  | 'legion'
-  | 'lordoftyphon'
-  | 'lleech'
-  | 'alhadikhia'
-  | 'riot'
-  | 'leviathan'
-  | 'gangster'
-  | 'gnome'
-  // Travellers (Extras)
-  | 'thief'
-  | 'bureaucrat'
-  | 'gunslinger'
-  | 'beggar'
-  | 'scapegoat'
-  // Fabled (Extras)
-  | 'angel'
-  | 'bootlegger'
-  | 'buddhist'
-  | 'djinn'
-  | 'doomsayer'
-  | 'duchess'
-  | 'ferryman'
-  | 'fibbin'
-  | 'fiddler'
-  | 'gardener'
-  | 'hellslibrarian'
-  | 'revolutionary'
-  | 'sentinel'
-  | 'spiritofivory'
-  | 'stormcatcher'
-  | 'toymaker'
+import { type DatasetChar } from '@/logic/dataset-types'
+import { type Character } from '@/logic/dataset-types'
+import { idAliases } from '@/logic/dataset-types'
+import dataset from '@/logic/dataset.json'
 
 export type HomebrewCharacterId = string
 
@@ -203,209 +31,30 @@ type HomebrewCharacter = {
 
 type BagMap = { [key in Character]: Edition }
 
-export type ParsedScript = { [key in BoxPick]: (Character | HomebrewCharacterId)[] }
+export type ParsedScript = Partial<{ [key in BoxPick]: (Character | HomebrewCharacterId)[] }>
 
-// Characters
-const characterEditionMap: BagMap = {
-  // Trouble Brewing
-  chef: 'Trouble Brewing',
-  investigator: 'Trouble Brewing',
-  washerwoman: 'Trouble Brewing',
-  librarian: 'Trouble Brewing',
-  empath: 'Trouble Brewing',
-  fortuneteller: 'Trouble Brewing',
-  undertaker: 'Trouble Brewing',
-  monk: 'Trouble Brewing',
-  ravenkeeper: 'Trouble Brewing',
-  virgin: 'Trouble Brewing',
-  slayer: 'Trouble Brewing',
-  soldier: 'Trouble Brewing',
-  mayor: 'Trouble Brewing',
-  butler: 'Trouble Brewing',
-  drunk: 'Trouble Brewing',
-  recluse: 'Trouble Brewing',
-  saint: 'Trouble Brewing',
-  poisoner: 'Trouble Brewing',
-  spy: 'Trouble Brewing',
-  scarletwoman: 'Trouble Brewing',
-  baron: 'Trouble Brewing',
-  imp: 'Trouble Brewing',
-  thief: 'Trouble Brewing',
-  bureaucrat: 'Trouble Brewing',
-  gunslinger: 'Trouble Brewing',
-  beggar: 'Trouble Brewing',
-  scapegoat: 'Trouble Brewing',
+const characterEditionMap: BagMap = Object.fromEntries(
+  dataset
+    .filter((char: DatasetChar) => !!char.id && !!char.version)
+    .map((char: DatasetChar) => {
+      // Remove prefix like "1 - " or "3a - " from version
+      const cleanEdition = char.version.replace(/^[\da-zA-Z]+ ?- /, '') as Edition
+      return [char.id, cleanEdition]
+    }),
+) as BagMap
 
-  // Bad Moon Rising
-  grandmother: 'Bad Moon Rising',
-  sailor: 'Bad Moon Rising',
-  chambermaid: 'Bad Moon Rising',
-  exorcist: 'Bad Moon Rising',
-  innkeeper: 'Bad Moon Rising',
-  gossip: 'Bad Moon Rising',
-  gambler: 'Bad Moon Rising',
-  courtier: 'Bad Moon Rising',
-  professor: 'Bad Moon Rising',
-  minstrel: 'Bad Moon Rising',
-  sweetheart: 'Bad Moon Rising',
-  fool: 'Bad Moon Rising',
-  moonchild: 'Bad Moon Rising',
-  tinker: 'Bad Moon Rising',
-  goon: 'Bad Moon Rising',
-  lunatic: 'Bad Moon Rising',
-  godfather: 'Bad Moon Rising',
-  devilsadvocate: 'Bad Moon Rising',
-  assassin: 'Bad Moon Rising',
-  pukka: 'Bad Moon Rising',
-  shabaloth: 'Bad Moon Rising',
-  zombuul: 'Bad Moon Rising',
-  po: 'Bad Moon Rising',
-  pacifist: 'Bad Moon Rising',
-  matron: 'Bad Moon Rising',
-  judge: 'Bad Moon Rising',
-  apprentice: 'Bad Moon Rising',
-  voudon: 'Bad Moon Rising',
-  bishop: 'Bad Moon Rising',
-  mastermind: 'Bad Moon Rising',
-
-  // Sects and Violets
-  artist: 'Sects and Violets',
-  clockmaker: 'Sects and Violets',
-  dreamer: 'Sects and Violets',
-  flowergirl: 'Sects and Violets',
-  juggler: 'Sects and Violets',
-  mathematician: 'Sects and Violets',
-  seamstress: 'Sects and Violets',
-  towncrier: 'Sects and Violets',
-  savant: 'Sects and Violets',
-  philosopher: 'Sects and Violets',
-  oracle: 'Sects and Violets',
-  sage: 'Sects and Violets',
-  mutant: 'Sects and Violets',
-  barber: 'Sects and Violets',
-  klutz: 'Sects and Violets',
-  cerenovus: 'Sects and Violets',
-  vigormortis: 'Sects and Violets',
-  vortox: 'Sects and Violets',
-  fanggu: 'Sects and Violets',
-  snakecharmer: 'Sects and Violets',
-  pithag: 'Sects and Violets',
-  eviltwin: 'Sects and Violets',
-  witch: 'Sects and Violets',
-  barista: 'Sects and Violets',
-  harlot: 'Sects and Violets',
-  butcher: 'Sects and Violets',
-  bonecollector: 'Sects and Violets',
-  deviant: 'Sects and Violets',
-
-  // Kickstarter Experimental
-  steward: 'Kickstarter Experimental',
-  knight: 'Kickstarter Experimental',
-  noble: 'Kickstarter Experimental',
-  shugenja: 'Kickstarter Experimental',
-  pixie: 'Kickstarter Experimental',
-  bountyhunter: 'Kickstarter Experimental',
-  general: 'Kickstarter Experimental',
-  king: 'Kickstarter Experimental',
-  engineer: 'Kickstarter Experimental',
-  huntsman: 'Kickstarter Experimental',
-  alchemist: 'Kickstarter Experimental',
-  cannibal: 'Kickstarter Experimental',
-  amnesiac: 'Kickstarter Experimental',
-  farmer: 'Kickstarter Experimental',
-  acrobat: 'Kickstarter Experimental',
-  lycanthrope: 'Kickstarter Experimental',
-  choirboy: 'Kickstarter Experimental',
-  magician: 'Kickstarter Experimental',
-  atheist: 'Kickstarter Experimental',
-  golem: 'Kickstarter Experimental',
-  damsel: 'Kickstarter Experimental',
-  snitch: 'Kickstarter Experimental',
-  heretic: 'Kickstarter Experimental',
-  puzzlemaster: 'Kickstarter Experimental',
-  mezepheles: 'Kickstarter Experimental',
-  fearmonger: 'Kickstarter Experimental',
-  psychopath: 'Kickstarter Experimental',
-  marionette: 'Kickstarter Experimental',
-  boomdandy: 'Kickstarter Experimental',
-  stormcatcher: 'Kickstarter Experimental',
-  legion: 'Kickstarter Experimental',
-  lleech: 'Kickstarter Experimental',
-  alhadikhia: 'Kickstarter Experimental',
-  riot: 'Kickstarter Experimental',
-  leviathan: 'Kickstarter Experimental',
-  gangster: 'Kickstarter Experimental',
-
-  // Unreleased Experimental
-  highpriestess: 'Unreleased Experimental',
-  balloonist: 'Unreleased Experimental',
-  preacher: 'Unreleased Experimental',
-  villageidiot: 'Unreleased Experimental',
-  alsaahir: 'Unreleased Experimental',
-  nightwatchman: 'Unreleased Experimental',
-  fisherman: 'Unreleased Experimental',
-  banshee: 'Unreleased Experimental',
-  ogre: 'Unreleased Experimental',
-  plaguedoctor: 'Unreleased Experimental',
-  hatter: 'Unreleased Experimental',
-  politician: 'Unreleased Experimental',
-  zealot: 'Unreleased Experimental',
-  harpy: 'Unreleased Experimental',
-  wizard: 'Unreleased Experimental',
-  widow: 'Unreleased Experimental',
-  xaan: 'Unreleased Experimental',
-  summoner: 'Unreleased Experimental',
-  goblin: 'Unreleased Experimental',
-  vizier: 'Unreleased Experimental',
-  organgrinder: 'Unreleased Experimental',
-  boffin: 'Unreleased Experimental',
-  yaggababble: 'Unreleased Experimental',
-  lilmonsta: 'Unreleased Experimental',
-  ojo: 'Unreleased Experimental',
-  kazali: 'Unreleased Experimental',
-  lordoftyphon: 'Unreleased Experimental',
-  gnome: 'Unreleased Experimental',
-  cultleader: 'Unreleased Experimental',
-  poppygrower: 'Unreleased Experimental',
-  tealady: 'Unreleased Experimental',
-
-  // Fabled
-  angel: 'Fabled',
-  bootlegger: 'Fabled',
-  buddhist: 'Fabled',
-  djinn: 'Fabled',
-  doomsayer: 'Fabled',
-  duchess: 'Fabled',
-  ferryman: 'Fabled',
-  fibbin: 'Fabled',
-  fiddler: 'Fabled',
-  gardener: 'Fabled',
-  hellslibrarian: 'Fabled',
-  revolutionary: 'Fabled',
-  sentinel: 'Fabled',
-  spiritofivory: 'Fabled',
-  toymaker: 'Fabled',
+// Add aliases for characters that have different names in the dataset using idAliases
+for (const [alias, original] of Object.entries(idAliases)) {
+  if (original in characterEditionMap) {
+    characterEditionMap[alias as Character] = characterEditionMap[original as Character]
+  } else {
+    console.warn(`Alias "${alias}" points to unknown character "${original}".`)
+  }
 }
 
-const travellers: Character[] = [
-  'scapegoat',
-  'gunslinger',
-  'beggar',
-  'bureaucrat',
-  'thief',
-  'butcher',
-  'bonecollector',
-  'harlot',
-  'barista',
-  'deviant',
-  'apprentice',
-  'matron',
-  'voudon',
-  'judge',
-  'bishop',
-  'gangster',
-  'gnome',
-]
+const travellers: Character[] = dataset
+  .filter((char: DatasetChar) => char.roleType === 'traveller')
+  .map((char: DatasetChar) => char.id as Character)
 
 export type Script = (Character | HomebrewCharacter | MetaObject)[]
 
@@ -463,14 +112,8 @@ export function parseScript(script: Script, hasKickstarter: boolean): ParsedScri
   // remap the editions to BoxPick and then group everything again
   const editionMap = editionMapping(hasKickstarter)
 
-  const boxPicks: { [key in BoxPick]: (Character | HomebrewCharacterId)[] } = {
-    'Trouble Brewing': [],
-    'Bad Moon Rising': [],
-    'Sects and Violets': [],
-    'Kickstarter Experimental': [],
-    Fabled: [],
-    Substitute: [],
-  }
+  // Initialize boxPicks as a blank object with no keys
+  const boxPicks: Partial<{ [key in BoxPick]: (Character | HomebrewCharacterId)[] }> = {}
 
   for (const edition in editions) {
     const boxPick = editionMap[edition as Edition]
@@ -483,4 +126,40 @@ export function parseScript(script: Script, hasKickstarter: boolean): ParsedScri
 export function isTraveller(char: Character): boolean {
   // if the character is in the travellers list, return true
   return travellers.includes(char)
+}
+
+export function suggestSubstitutions(script: ParsedScript): { [key in Character]?: Character[] } {
+  if (!script['Substitute']) return {}
+
+  const substitutions: { [key in Character]?: Character[] } = {}
+
+  // Collect all characters already in the script (flatten all arrays)
+  const usedCharacters = new Set(
+    Object.values(script)
+      .flat()
+      .filter((c): c is Character => typeof c === 'string'),
+  )
+
+  for (const char of script['Substitute']) {
+    // Find the DatasetChar for the substituted character
+    const charData = dataset.find((c: DatasetChar) => c.id === char)
+    if (!charData) continue
+
+    // Find possible substitutions
+    const possibleSubs = dataset
+      .filter(
+        (candidate: DatasetChar) =>
+          candidate.id !== char && // not the same character
+          !usedCharacters.has(candidate.id as Character) && // not already used
+          candidate.roleType === charData.roleType && // same alignment
+          !candidate.isDisabled, // not disabled
+      )
+      .map((c: DatasetChar) => c.id as Character)
+
+    if (possibleSubs.length > 0) {
+      substitutions[char as Character] = possibleSubs
+    }
+  }
+
+  return substitutions
 }

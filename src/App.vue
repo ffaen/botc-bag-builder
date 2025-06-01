@@ -1,50 +1,55 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { parseScript, type ParsedScript, isTraveller, type Character } from './logic/logic'
+import { ref, watch } from 'vue'
+import { parseScript, type ParsedScript, isTraveller } from './logic/logic'
+import type { Character } from './logic/dataset-types'
 
 const scriptInput = ref<string>('')
 const parseResult = ref<ParsedScript | null>(null)
 const error = ref<string | null>(null)
 const hasKickstarter = ref<boolean>(false)
-const urlInput = ref<string>('') // New: for URL input
 
-function handleFileUpload(event: Event) {
-  const files = (event.target as HTMLInputElement).files
-  if (!files || files.length === 0) return
-  const reader = new FileReader()
-  reader.onload = () => {
-    scriptInput.value = reader.result as string
-    tryParse()
-  }
-  reader.readAsText(files[0])
-}
-
-function handlePaste(event: ClipboardEvent) {
-  const text = event.clipboardData?.getData('text')
-  if (text) {
-    scriptInput.value = text
-    tryParse()
+function isProbablyUrl(text: string): boolean {
+  try {
+    const url = new URL(text.trim())
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
   }
 }
 
-async function handleUrlPaste() {
+async function handlePaste(event: ClipboardEvent) {
   error.value = null
   parseResult.value = null
-  if (!urlInput.value) {
-    error.value = 'Please enter a URL.'
+  const text = event.clipboardData?.getData('text')
+  if (!text) return
+
+  // If it's a URL, fetch and parse
+  if (isProbablyUrl(text)) {
+    scriptInput.value = text.trim()
+    try {
+      const response = await fetch(scriptInput.value)
+      if (!response.ok) throw new Error(`HTTP error: ${response.status}`)
+      const json = await response.json()
+      scriptInput.value = JSON.stringify(json, null, 2)
+      parseResult.value = parseScript(json, hasKickstarter.value)
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        error.value = 'Failed to fetch or parse JSON: ' + e.message
+        return
+      }
+      error.value = 'Unknown error.'
+    }
     return
   }
+
+  // Otherwise, treat as JSON
+  scriptInput.value = text
   try {
-    const response = await fetch(urlInput.value)
-    if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`)
-    }
-    const json = await response.json()
-    scriptInput.value = JSON.stringify(json, null, 2)
+    const json = JSON.parse(scriptInput.value)
     parseResult.value = parseScript(json, hasKickstarter.value)
   } catch (e: unknown) {
     if (e instanceof Error) {
-      error.value = 'Failed to fetch or parse JSON: ' + e.message
+      error.value = 'Failed to parse JSON: ' + e.message
       return
     }
     error.value = 'Unknown error.'
@@ -59,61 +64,45 @@ function tryParse() {
     parseResult.value = parseScript(json, hasKickstarter.value)
   } catch (e: unknown) {
     if (e instanceof Error) {
-      error.value = 'Failed to fetch or parse JSON: ' + e.message
+      error.value = 'Failed to parse JSON: ' + e.message
       return
     }
     error.value = 'Unknown error.'
   }
 }
+
+watch(hasKickstarter, () => {
+  if (!scriptInput.value) return
+  try {
+    const json = JSON.parse(scriptInput.value)
+    parseResult.value = parseScript(json, hasKickstarter.value)
+    error.value = null
+  } catch {
+    // Do not update parseResult, keep error as is or set to null
+  }
+})
 </script>
 
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-    <header class="mb-8">
+    <header class="mb-8 flex flex-col items-center">
+      <img src="@/assets/logo.png" alt="BOTC Logo" class="w-24 h-24 mb-4 rounded-lg" />
       <h1 class="text-3xl font-bold text-blue-700 drop-shadow">BOTC Bag Builder</h1>
     </header>
 
     <main class="w-full max-w-xl bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
       <div class="w-full space-y-4">
-        <label class="block font-semibold text-gray-700">
-          <span class="block mb-2">Upload Script JSON</span>
-          <input
-            type="file"
-            accept="application/json"
-            @change="handleFileUpload"
-            class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
+        <label class="block font-semibold text-gray-700 w-full">
+          <span class="block mb-2">Paste Script JSON or URL</span>
+          <textarea
+            v-model="scriptInput"
+            placeholder="Paste Script JSON or a URL to JSON here (Ctrl+V)"
+            rows="8"
+            cols="60"
+            @paste="handlePaste"
+            class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 font-mono text-sm bg-gray-50"
+          ></textarea>
         </label>
-        <label class="block font-semibold text-gray-700">
-          <span class="block mb-2">Paste Script JSON URL</span>
-          <div class="flex gap-2">
-            <input
-              v-model="urlInput"
-              type="url"
-              placeholder="Paste JSON URL here"
-              class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 font-mono text-sm bg-gray-50"
-            />
-            <button
-              @click="handleUrlPaste"
-              class="py-2 px-4 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition"
-            >
-              Fetch
-            </button>
-          </div>
-        </label>
-        <div class="flex items-center justify-between">
-          <label class="block font-semibold text-gray-700 w-full">
-            <span class="block mb-2">Paste Script JSON</span>
-            <textarea
-              v-model="scriptInput"
-              placeholder="Paste Script JSON here"
-              rows="8"
-              cols="60"
-              @paste="handlePaste"
-              class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 font-mono text-sm bg-gray-50"
-            ></textarea>
-          </label>
-        </div>
         <div class="flex items-center space-x-2">
           <input
             id="kickstarter-checkbox"
@@ -161,32 +150,3 @@ function tryParse() {
     </main>
   </div>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-}
-</style>
